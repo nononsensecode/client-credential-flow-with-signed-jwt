@@ -1,5 +1,9 @@
 package com.nononsensecode.oauth.controller
 
+import com.nimbusds.jose.JWSAlgorithm
+import com.nimbusds.jose.jwk.JWKSet
+import com.nimbusds.jose.jwk.KeyUse
+import com.nimbusds.jose.jwk.RSAKey
 import com.nononsensecode.oauth.dto.AccessTokenDTO
 import io.jsonwebtoken.Jwts
 import org.springframework.beans.factory.annotation.Value
@@ -44,9 +48,13 @@ class HeroController(
     val privateKey: KeyStore.PrivateKeyEntry
 ) {
     @GetMapping("/.well-known/jwks.json")
-    fun getJwks(): ResponseEntity<Map<String, Any>> {
-        val jwks = generateJWKSet()
-        return ResponseEntity(jwks, HttpStatus.OK)
+    fun getJwks(): ResponseEntity<MutableMap<String, Any>> {
+        val builder = RSAKey.Builder(privateKey.certificate.publicKey as RSAPublicKey)
+            .keyUse(KeyUse.SIGNATURE)
+            .algorithm(JWSAlgorithm.RS256)
+            .keyID(clientId)
+        val jwks = JWKSet(builder.build())
+        return ResponseEntity(jwks.toJSONObject(), HttpStatus.OK)
     }
 
     @GetMapping
