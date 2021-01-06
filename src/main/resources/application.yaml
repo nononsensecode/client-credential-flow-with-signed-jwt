@@ -1,0 +1,14 @@
+server:
+  port: 10002
+
+oauth2:
+  token_url: http://localhost:9000/auth/realms/heroes/protocol/openid-connect/token
+  grant_type: client_credentials
+  client_id: hero-app-client
+  scope: "openid email heroes"
+  client_assertion_type: "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+  jwk:
+    algorithm: RS256
+
+  resource_server:
+    url: http://localhost:10001/api/heroes
